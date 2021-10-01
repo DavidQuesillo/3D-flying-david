@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
+    public Transform cam;
+
     [SerializeField]
     private Rigidbody rb;
 
@@ -11,6 +13,8 @@ public class PlayerMovement : MonoBehaviour
     private float hSpeed = 1f;
     [SerializeField]
     private float vSpeed = 1f;
+
+    Vector2 rotation = Vector2.zero;
 
     // Start is called before the first frame update
     void Start()
@@ -22,17 +26,56 @@ public class PlayerMovement : MonoBehaviour
     void Update()
     {
         MoveHorizontal();
+        MoveVertical();
+        AimShooting();
     }
 
     private void MoveHorizontal()
     {
-        if (Input.GetKey(KeyCode.W))
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+
+        cam = Camera.main.transform;
+        Vector3 direction =  cam.forward * v + cam.right * h; //new Vector3(h, 0, v);
+        Vector3 finalvelocity = direction * hSpeed;
+        finalvelocity.y = rb.velocity.y;
+        rb.velocity = finalvelocity;
+    }
+
+    private void MoveVertical()
+    {
+        if (Input.GetKey(KeyCode.Space))
         {
-            rb.AddForce(Vector3.forward * hSpeed, ForceMode.Force);
+            rb.velocity = new Vector3 (rb.velocity.x, vSpeed, rb.velocity.z);
         }
-        if (Input.GetKey(KeyCode.S))
+        if (Input.GetKeyUp(KeyCode.Space))
         {
-            rb.AddForce(Vector3.back * hSpeed, ForceMode.Force);
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
         }
+
+        if (Input.GetKey(KeyCode.LeftControl))
+        {
+            rb.velocity = new Vector3(rb.velocity.x, -vSpeed, rb.velocity.z);
+        }
+        if (Input.GetKeyUp(KeyCode.LeftControl))
+        {
+            rb.velocity = new Vector3(rb.velocity.x, 0f, rb.velocity.z);
+        }
+    }
+
+    void AimShooting()
+    {
+        rotation.y += Input.GetAxis("Mouse X");
+        rotation.x += -Input.GetAxis("Mouse Y");
+        //Mathf.Clamp(rotation.x, -90f, 90f);
+        if (rotation.x <= -90)
+        {
+            rotation.x = -90;
+        }
+        if (rotation.x >= 90)
+        {
+            rotation.x = 90;
+        }
+        transform.eulerAngles = rotation;
     }
 }
