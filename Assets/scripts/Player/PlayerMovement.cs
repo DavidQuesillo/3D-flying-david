@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public Transform cam;
-
-    [SerializeField]
-    private Rigidbody rb;
-
     [SerializeField]
     private float hSpeed = 1f;
     [SerializeField]
     private float vSpeed = 1f;
+    [SerializeField]
+    private int hp = 10;
 
     Vector2 rotation = Vector2.zero;
+    public Transform cam;
+    [SerializeField]
+    private Rigidbody rb;
 
     // Start is called before the first frame update
     void Start()
@@ -77,5 +77,25 @@ public class PlayerMovement : MonoBehaviour
             rotation.x = 90;
         }
         transform.eulerAngles = rotation;
+    }
+
+    public void DamagePlayer(int ouch)
+    {
+        hp -= ouch;
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.transform.CompareTag("EnemyBullet"))
+        {
+            DamagePlayer(other.transform.GetComponent<EnemyBulletBase>().GetDamage());
+            Destroy(other.gameObject);
+
+        }
     }
 }
