@@ -38,11 +38,13 @@ public class PlayerProjectile : MonoBehaviour
         if (other.GetComponent<EBulletHoming>() != null)
         {
             other.GetComponent<EBulletHoming>().DamageProjectile(damage);
+            Destroy(gameObject);
             return;
         }
         if (other.GetComponent<EnemyHealth>() != null)
         {
             other.GetComponent<EnemyHealth>().TakeDamage(damage);
+            Destroy(gameObject);
         }
     }
 }
